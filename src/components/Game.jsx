@@ -359,6 +359,13 @@ const Game = () => {
         navigator.clipboard.writeText(text).then(() => alert('Copied to clipboard!'));
     };
 
+    const handleTryAgain = () => {
+        // Reset game state but keep time and lives
+        setGameState('playing');
+        setFrogPos({ x: Math.floor(GRID_SIZE.cols / 2), y: GRID_SIZE.rows - 1 });
+        setShowWasted(false);
+    };
+
     return (
         <div className="flex flex-col items-center justify-between h-[100dvh] bg-gray-900 overflow-hidden">
             <div className="flex flex-col items-center w-full pt-2 px-2 flex-shrink-0">
@@ -382,7 +389,7 @@ const Game = () => {
                     {showWasted && <WastedOverlay onComplete={handleWastedComplete} />}
 
                     {gameState === 'won' && (
-                        <GameOver won={true} time={time} livesUsed={livesUsed} onShare={handleShare} />
+                        <GameOver won={true} time={time} livesUsed={livesUsed} onShare={handleShare} onTryAgain={handleTryAgain} />
                     )}
                 </div>
             </div>

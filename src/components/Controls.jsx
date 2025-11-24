@@ -3,53 +3,49 @@ import React, { useState, useEffect } from 'react';
 const Controls = ({ onMove }) => {
     const [activeKey, setActiveKey] = useState(null);
 
-    // Container rotated 45 degrees - removed circular border and rounded-full
+    // Container rotated 45 degrees - removed circular border
     const containerClass = "relative w-48 h-48 bg-gray-900 overflow-hidden rotate-45";
 
-    // Button base: fills the quadrant, flex center - minimal styling
-    const btnBase = "w-full h-full flex items-center justify-center text-3xl text-gray-400 touch-manipulation select-none outline-none bg-gray-900 transition-colors";
+    // Button base with conditional active state
+    const getButtonClass = (direction) => {
+        const baseClass = "w-full h-full flex items-center justify-center text-3xl touch-manipulation select-none outline-none bg-gray-900 transition-colors";
+        const normalColor = "text-gray-400";
+        const activeColor = "text-gray-300";
+        const isActive = activeKey === direction;
+        return `${baseClass} ${isActive ? activeColor : normalColor} `;
+    };
 
     // Icon rotation to counteract container rotation (-45deg)
     const iconClass = "-rotate-45";
 
-    // Add keyboard event listeners
+    // Handle keyboard events
     useEffect(() => {
         const handleKeyDown = (e) => {
-            if (e.repeat) return; // Ignore repeated keydown events
+            const keyMap = {
+                'ArrowUp': 'up',
+                'ArrowDown': 'down',
+                'ArrowLeft': 'left',
+                'ArrowRight': 'right'
+            };
 
-            let direction = null;
-            switch (e.key) {
-                case 'ArrowUp':
-                    direction = 'up';
-                    break;
-                case 'ArrowDown':
-                    direction = 'down';
-                    break;
-                case 'ArrowLeft':
-                    direction = 'left';
-                    break;
-                case 'ArrowRight':
-                    direction = 'right';
-                    break;
-                default:
-                    return;
+            const direction = keyMap[e.key];
+            if (direction) {
+                e.preventDefault();
+                setActiveKey(direction);
+                onMove(direction);
             }
-
-            e.preventDefault();
-            setActiveKey(direction);
-            onMove(direction); // Trigger move on keydown
         };
 
         const handleKeyUp = (e) => {
-            switch (e.key) {
-                case 'ArrowUp':
-                case 'ArrowDown':
-                case 'ArrowLeft':
-                case 'ArrowRight':
-                    setActiveKey(null);
-                    break;
-                default:
-                    break;
+            const keyMap = {
+                'ArrowUp': 'up',
+                'ArrowDown': 'down',
+                'ArrowLeft': 'left',
+                'ArrowRight': 'right'
+            };
+
+            if (keyMap[e.key]) {
+                setActiveKey(null);
             }
         };
 
@@ -62,19 +58,20 @@ const Controls = ({ onMove }) => {
         };
     }, [onMove]);
 
-    const getButtonClass = (direction) => {
-        const isActive = activeKey === direction;
-        return `${btnBase} ${isActive ? 'text-gray-300' : ''} `;
+    const handleButtonClick = (direction) => {
+        setActiveKey(direction);
+        onMove(direction);
+        setTimeout(() => setActiveKey(null), 150);
     };
 
     return (
-        <div className="flex justify-center mb-2">
+        <div className="flex justify-center mb-4">
             <div className={containerClass}>
                 <div className="grid grid-cols-2 grid-rows-2 w-full h-full">
                     {/* Top-Left Quadrant -> UP */}
                     <button
                         className={`${getButtonClass('up')} border - r - 4 border - b - 4 border - gray - 700`}
-                        onClick={() => onMove('up')}
+                        onClick={() => handleButtonClick('up')}
                         aria-label="Move Up"
                     >
                         <span className={iconClass}>▲</span>
@@ -83,7 +80,7 @@ const Controls = ({ onMove }) => {
                     {/* Top-Right Quadrant -> RIGHT */}
                     <button
                         className={`${getButtonClass('right')} border - b - 4 border - gray - 700`}
-                        onClick={() => onMove('right')}
+                        onClick={() => handleButtonClick('right')}
                         aria-label="Move Right"
                     >
                         <span className={iconClass}>▶</span>
@@ -92,7 +89,7 @@ const Controls = ({ onMove }) => {
                     {/* Bottom-Left Quadrant -> LEFT */}
                     <button
                         className={`${getButtonClass('left')} border - r - 4 border - gray - 700`}
-                        onClick={() => onMove('left')}
+                        onClick={() => handleButtonClick('left')}
                         aria-label="Move Left"
                     >
                         <span className={iconClass}>◀</span>
@@ -100,8 +97,8 @@ const Controls = ({ onMove }) => {
 
                     {/* Bottom-Right Quadrant -> DOWN */}
                     <button
-                        className={`${getButtonClass('down')} `}
-                        onClick={() => onMove('down')}
+                        className={getButtonClass('down')}
+                        onClick={() => handleButtonClick('down')}
                         aria-label="Move Down"
                     >
                         <span className={iconClass}>▼</span>

@@ -186,10 +186,8 @@ const Game = () => {
         setFrogPos(prev => {
             const newPos = moveFrog(prev, direction);
 
-            // Snap to grid if moving vertically to "lock in"
-            if (direction === 'up' || direction === 'down') {
-                newPos.x = Math.round(newPos.x);
-            }
+            // Snap to grid on EVERY move to respect the "single block" rule
+            newPos.x = Math.round(newPos.x);
 
             frogPosRef.current = newPos; // Sync ref immediately
             return newPos;

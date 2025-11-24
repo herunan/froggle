@@ -205,19 +205,9 @@ const Game = () => {
         });
     }, [gameState, showWasted]);
 
-    // Keyboard controls
-    useEffect(() => {
-        const handleKeyDown = (e) => {
-            switch (e.key) {
-                case 'ArrowUp': handleMove('up'); break;
-                case 'ArrowDown': handleMove('down'); break;
-                case 'ArrowLeft': handleMove('left'); break;
-                case 'ArrowRight': handleMove('right'); break;
-            }
-        };
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [handleMove]);
+    // Keyboard controls are handled by Controls.jsx to avoid duplication
+
+
 
     // Sync ref with state - still needed for initial load or resets
     useEffect(() => {

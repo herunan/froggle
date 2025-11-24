@@ -21,6 +21,9 @@ const Controls = ({ onMove }) => {
     // Handle keyboard events
     useEffect(() => {
         const handleKeyDown = (e) => {
+            // Prevent key repeat (desktop holds)
+            if (e.repeat) return;
+
             const keyMap = {
                 'ArrowUp': 'up',
                 'ArrowDown': 'down',

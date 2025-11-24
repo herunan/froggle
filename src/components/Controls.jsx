@@ -3,8 +3,8 @@ import React, { useState, useEffect } from 'react';
 const Controls = ({ onMove }) => {
     const [activeKey, setActiveKey] = useState(null);
 
-    // Container rotated 45 degrees - removed circular border
-    const containerClass = "relative w-48 h-48 bg-gray-900 overflow-hidden rotate-45";
+    // Container rotated 45 degrees - no outer border
+    const containerClass = "relative w-40 h-40 bg-gray-900 overflow-hidden rotate-45";
 
     // Button base with conditional active state
     const getButtonClass = (direction) => {
@@ -65,7 +65,7 @@ const Controls = ({ onMove }) => {
     };
 
     return (
-        <div className="flex justify-center mb-4">
+        <div className="flex justify-center mb-2">
             <div className={containerClass}>
                 <div className="grid grid-cols-2 grid-rows-2 w-full h-full">
                     {/* Top-Left Quadrant -> UP */}

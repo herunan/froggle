@@ -7,14 +7,13 @@ const ScoreBoard = ({ livesUsed, time }) => {
     const timeStr = `${minutes}:${seconds.toString().padStart(2, '0')}.${milliseconds}`;
 
     return (
-        <div className="flex justify-between items-center w-full max-w-[85vw] md:max-w-[500px] px-2 mb-2 text-white">
+        <div className="flex justify-between items-center w-full max-w-[85vw] md:max-w-[500px] px-2 mb-1 text-white">
             <div className="flex items-center gap-2">
                 <span className="text-red-500 text-xl">❤️</span>
                 <span className="font-mono text-lg">{livesUsed}</span>
             </div>
             <div className="flex items-center gap-2">
-                <span className="text-white text-sm uppercase">TIME:</span>
-                <span className="font-mono text-lg">{timeStr}s</span>
+                <span className="font-mono text-lg">{timeStr}</span>
             </div>
         </div>
     );

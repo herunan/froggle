@@ -3,8 +3,8 @@ import React, { useState, useEffect } from 'react';
 const Controls = ({ onMove }) => {
     const [activeKey, setActiveKey] = useState(null);
 
-    // Container rotated 45 degrees - no outer border
-    const containerClass = "relative w-40 h-40 bg-gray-900 overflow-hidden rotate-45";
+    // Container rotated 45 degrees - no outer border, smaller size
+    const containerClass = "relative w-32 h-32 bg-gray-900 overflow-hidden rotate-45";
 
     // Button base with conditional active state
     const getButtonClass = (direction) => {
@@ -65,12 +65,12 @@ const Controls = ({ onMove }) => {
     };
 
     return (
-        <div className="flex justify-center mb-2">
+        <div className="flex justify-center mb-1">
             <div className={containerClass}>
                 <div className="grid grid-cols-2 grid-rows-2 w-full h-full">
                     {/* Top-Left Quadrant -> UP */}
                     <button
-                        className={`${getButtonClass('up')} border - r - 4 border - b - 4 border - gray - 700`}
+                        className={`${getButtonClass('up')} border-r-4 border-b-4 border-gray-700`}
                         onClick={() => handleButtonClick('up')}
                         aria-label="Move Up"
                     >
@@ -79,7 +79,7 @@ const Controls = ({ onMove }) => {
 
                     {/* Top-Right Quadrant -> RIGHT */}
                     <button
-                        className={`${getButtonClass('right')} border - b - 4 border - gray - 700`}
+                        className={`${getButtonClass('right')} border-b-4 border-gray-700`}
                         onClick={() => handleButtonClick('right')}
                         aria-label="Move Right"
                     >
@@ -88,7 +88,7 @@ const Controls = ({ onMove }) => {
 
                     {/* Bottom-Left Quadrant -> LEFT */}
                     <button
-                        className={`${getButtonClass('left')} border - r - 4 border - gray - 700`}
+                        className={`${getButtonClass('left')} border-r-4 border-gray-700`}
                         onClick={() => handleButtonClick('left')}
                         aria-label="Move Left"
                     >

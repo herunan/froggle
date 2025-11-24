@@ -370,9 +370,9 @@ const Game = () => {
     };
 
     return (
-        <div className="flex flex-col items-center justify-between h-screen bg-gray-900 p-2 pb-safe overflow-hidden">
+        <div className="flex flex-col items-center justify-between h-screen bg-gray-900 p-1 pb-safe overflow-hidden">
             <div className="flex flex-col items-center w-full">
-                <h1 className="text-3xl md:text-4xl font-bold text-green-400 mb-1 font-pixel">FROGGLE</h1>
+                <h1 className="text-3xl md:text-4xl font-bold text-green-400 mb-0 font-pixel">FROGGLE</h1>
                 <ScoreBoard livesUsed={livesUsed} time={time} />
             </div>
 

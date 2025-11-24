@@ -3,12 +3,12 @@ import React, { useState, useEffect } from 'react';
 const Controls = ({ onMove }) => {
     const [activeKey, setActiveKey] = useState(null);
 
-    // Container rotated 45 degrees - larger to accommodate bigger tap targets
-    const containerClass = "relative w-48 h-48 bg-gray-900 overflow-hidden rotate-45";
+    // Container rotated 45 degrees - same visual size as before
+    const containerClass = "relative w-32 h-32 bg-gray-900 overflow-hidden rotate-45";
 
-    // Button base with conditional active state - Added padding for larger tap area
+    // Button base with large padding for bigger tap area while maintaining visual appearance
     const getButtonClass = (direction) => {
-        const baseClass = "w-full h-full flex items-center justify-center text-2xl touch-manipulation select-none outline-none bg-gray-900 transition-colors p-6";
+        const baseClass = "w-full h-full flex items-center justify-center text-3xl touch-manipulation select-none outline-none bg-gray-900 transition-colors p-8";
         const normalColor = "text-gray-400";
         const activeColor = "text-gray-300";
         const isActive = activeKey === direction;

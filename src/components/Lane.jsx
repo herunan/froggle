@@ -1,19 +1,24 @@
 import React from 'react';
 import { LANE_TYPES, OBJECT_TYPES } from '../utils/constants';
-import Obstacle from './Obstacle';
+import Sprite from './Sprite';
 
-const Lane = ({ type, obstacles, rowIndex }) => {
+const Lane = ({ type, obstacles, rowIndex, direction }) => {
     const getBgColor = () => {
         switch (type) {
-            case LANE_TYPES.ROAD: return 'bg-gray-800';
-            case LANE_TYPES.RIVER: return 'bg-blue-500';
-            case LANE_TYPES.GOAL: return 'bg-green-800';
-            default: return 'bg-gray-900'; // Safe zone
+            case LANE_TYPES.ROAD: return 'bg-[#2d2d2d]'; // Dark asphalt
+            case LANE_TYPES.RIVER: return 'bg-[#4fa4b8]'; // GBC Water
+            case LANE_TYPES.GOAL: return 'bg-[#306230]'; // GBC Green
+            default: return 'bg-[#306230]'; // Safe zone (Grass)
         }
     };
 
     return (
         <div className={`relative w-full h-[6.66%] ${getBgColor()} overflow-hidden border-b border-black/10`}>
+            {/* Lane Texture/Detail could go here */}
+            {type === LANE_TYPES.SAFE && (
+                <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(#0f380f 1px, transparent 1px)', backgroundSize: '10px 10px' }}></div>
+            )}
+
             {/* Render obstacles */}
             {obstacles.map((obs, i) => (
                 <div
@@ -26,10 +31,12 @@ const Lane = ({ type, obstacles, rowIndex }) => {
                         transition: 'opacity 0.3s ease'
                     }}
                 >
-                    {/* Render Obstacle SVG */}
-                    <div className="w-full h-full p-[2px]">
-                        <Obstacle type={obs.type} width={obs.width} />
-                    </div>
+                    <Sprite
+                        type={obs.type}
+                        width={obs.width || 1}
+                        direction={direction}
+                        sinking={obs.sinking}
+                    />
                 </div>
             ))}
         </div>

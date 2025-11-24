@@ -11,11 +11,11 @@ const Frog = ({ position, direction }) => {
         height: `${100 / 15}%`, // 1/15th of the height
     };
 
-    // Simple SVG Frog
     // Use same coordinate system as obstacles: x * 6.66% (15 columns)
     const visualX = position.x * 6.66;
     const visualY = position.y * 6.66;
 
+    // GBC Frog Sprite
     return (
         <div
             className="absolute z-20"
@@ -26,32 +26,31 @@ const Frog = ({ position, direction }) => {
                 height: '6.66%'
             }}
         >
-            <svg viewBox="0 0 100 100" className={`w-full h-full drop-shadow-sm ${direction === 'down' ? 'rotate-180' : direction === 'left' ? '-rotate-90' : direction === 'right' ? 'rotate-90' : ''}`}>
-                {/* Back Legs (Splayed) */}
-                <path d="M10 70 Q 5 50 25 50 L 30 60" stroke="#15803d" strokeWidth="8" fill="none" strokeLinecap="round" />
-                <path d="M90 70 Q 95 50 75 50 L 70 60" stroke="#15803d" strokeWidth="8" fill="none" strokeLinecap="round" />
+            <svg viewBox="0 0 16 16" style={{ shapeRendering: 'crispEdges' }} className={`w-full h-full ${direction === 'down' ? 'rotate-180' : direction === 'left' ? '-rotate-90' : direction === 'right' ? 'rotate-90' : ''}`}>
+                {/* Shadow */}
+                <rect x="2" y="13" width="12" height="2" fill="rgba(0,0,0,0.3)" />
+
+                {/* Back Legs */}
+                <rect x="1" y="8" width="3" height="5" fill="#306230" />
+                <rect x="12" y="8" width="3" height="5" fill="#306230" />
+
+                {/* Body */}
+                <rect x="4" y="3" width="8" height="10" fill="#8bac0f" />
+                <rect x="4" y="3" width="8" height="1" fill="#9bbc0f" /> {/* Highlight */}
+
+                {/* Head/Eyes */}
+                <rect x="4" y="2" width="3" height="3" fill="#8bac0f" />
+                <rect x="9" y="2" width="3" height="3" fill="#8bac0f" />
+                <rect x="5" y="3" width="1" height="1" fill="black" />
+                <rect x="10" y="3" width="1" height="1" fill="black" />
 
                 {/* Front Legs */}
-                <path d="M30 30 L 15 20" stroke="#15803d" strokeWidth="6" fill="none" strokeLinecap="round" />
-                <path d="M70 30 L 85 20" stroke="#15803d" strokeWidth="6" fill="none" strokeLinecap="round" />
+                <rect x="2" y="4" width="2" height="3" fill="#8bac0f" />
+                <rect x="12" y="4" width="2" height="3" fill="#8bac0f" />
 
-                {/* Body (Main shape) */}
-                <ellipse cx="50" cy="55" rx="25" ry="30" fill="#4ade80" />
-
-                {/* Head Area (Slightly smaller, on top) */}
-                <ellipse cx="50" cy="35" rx="20" ry="15" fill="#4ade80" />
-
-                {/* Eyes (Bulging) */}
-                <circle cx="35" cy="25" r="6" fill="#4ade80" stroke="#15803d" strokeWidth="1" />
-                <circle cx="65" cy="25" r="6" fill="#4ade80" stroke="#15803d" strokeWidth="1" />
-
-                {/* Pupils */}
-                <circle cx="35" cy="25" r="2" fill="black" />
-                <circle cx="65" cy="25" r="2" fill="black" />
-
-                {/* Back Pattern (Stripes/Spots) */}
-                <path d="M40 60 L 60 60" stroke="#15803d" strokeWidth="3" opacity="0.5" />
-                <path d="M45 70 L 55 70" stroke="#15803d" strokeWidth="3" opacity="0.5" />
+                {/* Back Spots */}
+                <rect x="6" y="7" width="1" height="1" fill="#306230" />
+                <rect x="9" y="9" width="1" height="1" fill="#306230" />
             </svg>
         </div>
     );

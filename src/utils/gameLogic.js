@@ -1,36 +1,21 @@
 import { GRID_SIZE, OBJECT_SIZES, LANE_TYPES } from './constants';
 
+// BLOCK-BASED COLLISION SYSTEM
+// Frog and obstacles occupy discrete blocks on a grid
+
 export const isColliding = (frog, obstacles, laneType) => {
-    // Dynamic padding based on lane type
-    // River: 0.0 (or slightly negative) to make landing SAFE even on edges
-    // Road: 0.2 to make dodging EASIER (smaller car hitboxes)
-    let padding = 0.05; // Default
-
-    if (laneType === LANE_TYPES.RIVER) {
-        padding = 0.0; // Touching the edge is SAFE
-    } else if (laneType === LANE_TYPES.ROAD) {
-        padding = 0.2; // Hitbox is 40% smaller (0.2 from each side), easier to dodge
-    }
-
-    // Frog hitbox - keep it standard or slightly forgiving?
-    // Let's keep frog standard (1x1) but apply padding to the interaction logic above effectively
-    // Actually, applying padding to the *check* is cleaner.
-
-    const frogLeft = frog.x + padding;
-    const frogRight = frog.x + 1 - padding;
+    // Frog occupies exactly one block (integer coordinates)
+    const frogBlock = Math.round(frog.x);
 
     for (const obs of obstacles) {
-        // USE OBS.WIDTH IF AVAILABLE! (Fix for variable log lengths)
         const obsWidth = obs.width || OBJECT_SIZES[obs.type] || 1;
+        const obsStartBlock = Math.round(obs.x);
+        const obsEndBlock = obsStartBlock + obsWidth - 1; // Inclusive
 
-        // Obstacle hitbox
-        const obsLeft = obs.x + padding;
-        const obsRight = obs.x + obsWidth - padding;
+        // Check if frog block is within obstacle blocks
+        const hit = frogBlock >= obsStartBlock && frogBlock <= obsEndBlock;
 
-        // Check horizontal overlap
-        const overlap = frogLeft < obsRight && frogRight > obsLeft;
-
-        if (overlap) {
+        if (hit) {
             if (laneType === LANE_TYPES.ROAD) {
                 return true; // Hit by car
             } else if (laneType === LANE_TYPES.RIVER) {
@@ -58,10 +43,10 @@ export const moveFrog = (currentPos, direction) => {
             newPos.y = Math.min(GRID_SIZE.rows - 1, newPos.y + 1);
             break;
         case 'left':
-            newPos.x = Math.max(0, newPos.x - 1);
+            newPos.x = Math.max(0, Math.round(currentPos.x) - 1);
             break;
         case 'right':
-            newPos.x = Math.min(GRID_SIZE.cols - 1, newPos.x + 1);
+            newPos.x = Math.min(GRID_SIZE.cols - 1, Math.round(currentPos.x) + 1);
             break;
     }
 
@@ -69,22 +54,15 @@ export const moveFrog = (currentPos, direction) => {
 };
 
 export const findPlatformUnder = (frog, obstacles) => {
-    // Match the RIVER padding from isColliding (0.0)
-    const padding = 0.0;
-
-    const frogLeft = frog.x + padding;
-    const frogRight = frog.x + 1 - padding;
+    const frogBlock = Math.round(frog.x);
 
     for (const obs of obstacles) {
-        // USE OBS.WIDTH IF AVAILABLE!
         const obsWidth = obs.width || OBJECT_SIZES[obs.type] || 1;
-        const obsLeft = obs.x + padding;
-        const obsRight = obs.x + obsWidth - padding;
+        const obsStartBlock = Math.round(obs.x);
+        const obsEndBlock = obsStartBlock + obsWidth - 1; // Inclusive
 
-        // Check if frog is on this platform
-        const overlap = frogLeft < obsRight && frogRight > obsLeft;
-
-        if (overlap) {
+        // Check if frog block is within platform blocks
+        if (frogBlock >= obsStartBlock && frogBlock <= obsEndBlock) {
             return obs;
         }
     }
@@ -92,4 +70,27 @@ export const findPlatformUnder = (frog, obstacles) => {
     return null;
 };
 
+export const snapFrogToPlatform = (frog, platform) => {
+    if (!platform) return frog.x;
 
+    // Snap to nearest block on platform
+    const frogBlock = Math.round(frog.x);
+    const obsWidth = platform.width || OBJECT_SIZES[platform.type] || 1;
+    const obsStartBlock = Math.round(platform.x);
+    const obsEndBlock = obsStartBlock + obsWidth - 1;
+
+    // Clamp frog to platform bounds
+    const snappedBlock = Math.max(obsStartBlock, Math.min(obsEndBlock, frogBlock));
+
+    return snappedBlock;
+};
+
+export const getFrogBlockOnPlatform = (frog, platform) => {
+    if (!platform) return null;
+
+    // Return which block of the platform the frog is on (0-indexed relative to platform start)
+    const frogBlock = Math.round(frog.x);
+    const obsStartBlock = Math.round(platform.x);
+
+    return frogBlock - obsStartBlock;
+};

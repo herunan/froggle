@@ -20,7 +20,8 @@ export const isColliding = (frog, obstacles, laneType) => {
     const frogRight = frog.x + 1 - padding;
 
     for (const obs of obstacles) {
-        const obsWidth = OBJECT_SIZES[obs.type] || 1;
+        // USE OBS.WIDTH IF AVAILABLE! (Fix for variable log lengths)
+        const obsWidth = obs.width || OBJECT_SIZES[obs.type] || 1;
 
         // Obstacle hitbox
         const obsLeft = obs.x + padding;
@@ -75,7 +76,8 @@ export const findPlatformUnder = (frog, obstacles) => {
     const frogRight = frog.x + 1 - padding;
 
     for (const obs of obstacles) {
-        const obsWidth = OBJECT_SIZES[obs.type] || 1;
+        // USE OBS.WIDTH IF AVAILABLE!
+        const obsWidth = obs.width || OBJECT_SIZES[obs.type] || 1;
         const obsLeft = obs.x + padding;
         const obsRight = obs.x + obsWidth - padding;
 
@@ -90,13 +92,4 @@ export const findPlatformUnder = (frog, obstacles) => {
     return null;
 };
 
-export const centerFrogOnPlatform = (frog, platform) => {
-    if (!platform) return frog.x;
 
-    const obsWidth = OBJECT_SIZES[platform.type] || 1;
-    // Center of platform
-    const platformCenter = platform.x + (obsWidth / 2);
-
-    // Center frog on platform (frog is 1 unit wide, so center is at 0.5)
-    return platformCenter - 0.5;
-};

@@ -189,15 +189,6 @@ const Game = () => {
             // Snap to grid if moving vertically to "lock in"
             if (direction === 'up' || direction === 'down') {
                 newPos.x = Math.round(newPos.x);
-
-                // If landing on a river lane, center on the platform
-                const targetLane = lanesRef.current[newPos.y];
-                if (targetLane && targetLane.type === LANE_TYPES.RIVER) {
-                    const platform = findPlatformUnder(newPos, targetLane.obstacles);
-                    if (platform) {
-                        newPos.x = centerFrogOnPlatform(newPos, platform);
-                    }
-                }
             }
 
             frogPosRef.current = newPos; // Sync ref immediately

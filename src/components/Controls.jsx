@@ -4,11 +4,11 @@ const Controls = ({ onMove }) => {
     const [activeKey, setActiveKey] = useState(null);
 
     // Container rotated 45 degrees - no outer border, larger size
-    const containerClass = "relative w-48 h-48 bg-gray-900 overflow-hidden rotate-45";
+    const containerClass = "relative w-48 h-48 bg-transparent overflow-hidden rotate-45";
 
     // Button base with conditional active state
     const getButtonClass = (direction) => {
-        const baseClass = "w-full h-full flex items-center justify-center text-3xl touch-manipulation select-none outline-none bg-gray-900 transition-colors";
+        const baseClass = "w-full h-full flex items-center justify-center text-3xl touch-manipulation select-none outline-none bg-transparent transition-colors";
         const normalColor = "text-gray-400";
         const activeColor = "text-gray-300";
         const isActive = activeKey === direction;

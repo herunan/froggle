@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { GRID_SIZE, LANE_TYPES, OBJECT_SIZES, OBJECT_TYPES, SPEEDS, DIRECTIONS } from '../utils/constants';
 import { getRNG } from '../utils/dailySeed';
-import { isColliding, moveFrog, findPlatformUnder, snapFrogToPlatform, getFrogBlockOnPlatform } from '../utils/gameLogic';
+import { isColliding, moveFrog, findPlatformUnder, centerFrogOnPlatform } from '../utils/gameLogic';
 import Lane from './Lane';
 import Frog from './Frog';
 import Controls from './Controls';
@@ -108,26 +108,20 @@ const Game = () => {
                 for (let j = 0; j < count; j++) {
                     let width = OBJECT_SIZES[obsType];
 
-                    // Variable log lengths (2-7 blocks)
+                    // Variable log lengths (1, 2, or 3 blocks, but mostly 2)
                     if (obsType === OBJECT_TYPES.LOG) {
                         const lengthChoice = rng.nextFloat();
                         if (lengthChoice < 0.2) {
-                            width = 2; // 20% chance
-                        } else if (lengthChoice < 0.5) {
-                            width = 3; // 30% chance
-                        } else if (lengthChoice < 0.75) {
-                            width = 4; // 25% chance
-                        } else if (lengthChoice < 0.9) {
-                            width = 5; // 15% chance
-                        } else if (lengthChoice < 0.97) {
-                            width = 6; // 7% chance
+                            width = 1; // 20% chance
+                        } else if (lengthChoice < 0.85) {
+                            width = 2; // 65% chance
                         } else {
-                            width = 7; // 3% chance
+                            width = 3; // 15% chance
                         }
                     }
 
                     obstacles.push({
-                        x: Math.round((j * (GRID_SIZE.cols / count)) + rng.nextRange(0, 2)),
+                        x: (j * (GRID_SIZE.cols / count)) + rng.nextRange(0, 2),
                         type: obsType,
                         width: width,
                         // For turtles, add sinking state (starts visible)
@@ -165,7 +159,7 @@ const Game = () => {
                 const count = rng.nextRange(2, 4);
                 for (let j = 0; j < count; j++) {
                     obstacles.push({
-                        x: Math.round((j * (GRID_SIZE.cols / count)) + rng.nextRange(0, 2)),
+                        x: (j * (GRID_SIZE.cols / count)) + rng.nextRange(0, 2),
                         type: obsType,
                         width: OBJECT_SIZES[obsType]
                     });
@@ -196,12 +190,12 @@ const Game = () => {
             if (direction === 'up' || direction === 'down') {
                 newPos.x = Math.round(newPos.x);
 
-                // If landing on a river lane, snap to platform
+                // If landing on a river lane, center on the platform
                 const targetLane = lanesRef.current[newPos.y];
                 if (targetLane && targetLane.type === LANE_TYPES.RIVER) {
                     const platform = findPlatformUnder(newPos, targetLane.obstacles);
                     if (platform) {
-                        newPos.x = snapFrogToPlatform(newPos, platform);
+                        newPos.x = centerFrogOnPlatform(newPos, platform);
                     }
                 }
             }
@@ -272,27 +266,23 @@ const Game = () => {
             lanesRef.current = currentLanes;
             setLanes(currentLanes);
 
-            // Handle River Drift - Lock frog to platform block
+            // Handle River Drift
             const currentFrogY = frogPosRef.current.y;
             const currentLane = currentLanes[currentFrogY];
 
             if (currentLane && currentLane.type === LANE_TYPES.RIVER) {
-                // Find platform under frog
-                const platform = findPlatformUnder(frogPosRef.current, currentLane.obstacles);
+                // Check if on log (safe)
+                const dead = isColliding(frogPosRef.current, currentLane.obstacles, currentLane.type);
 
-                if (platform) {
-                    // Get which block on the platform the frog is on
-                    const frogBlockOnPlatform = getFrogBlockOnPlatform(frogPosRef.current, platform);
-
-                    // Calculate new frog position based on platform position
-                    const platformStartBlock = Math.round(platform.x);
-                    const newFrogBlock = platformStartBlock + frogBlockOnPlatform;
+                if (!dead) {
+                    const drift = currentLane.speed * deltaTime * currentLane.direction;
+                    const newX = frogPosRef.current.x + drift;
 
                     // Update Ref IMMEDIATELY to prevent lag in next frame calculation
-                    frogPosRef.current = { ...frogPosRef.current, x: newFrogBlock };
+                    frogPosRef.current = { ...frogPosRef.current, x: newX };
 
                     // Update State to trigger render
-                    setFrogPos(prev => ({ ...prev, x: newFrogBlock }));
+                    setFrogPos(prev => ({ ...prev, x: newX }));
                 }
             }
         }

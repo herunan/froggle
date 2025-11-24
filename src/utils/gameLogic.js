@@ -96,9 +96,17 @@ export const centerFrogOnPlatform = (frog, platform) => {
     if (!platform) return frog.x;
 
     const obsWidth = platform.width || OBJECT_SIZES[platform.type] || 1;
-    // Center of platform
-    const platformCenter = platform.x + (obsWidth / 2);
 
-    // Center frog on platform (frog is 1 unit wide, so center is at 0.5)
-    return platformCenter - 0.5;
+    // Instead of centering on entire platform, snap to nearest grid block on the platform
+    // Platform occupies blocks from platform.x to (platform.x + obsWidth - 1)
+
+    // Round frog position to nearest integer block
+    const snappedX = Math.round(frog.x);
+
+    // Ensure it's within the platform bounds
+    const minX = Math.ceil(platform.x);
+    const maxX = Math.floor(platform.x + obsWidth - 1);
+
+    // Clamp to platform range
+    return Math.max(minX, Math.min(maxX, snappedX));
 };

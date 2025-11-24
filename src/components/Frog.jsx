@@ -12,15 +12,18 @@ const Frog = ({ position, direction }) => {
     };
 
     // Simple SVG Frog
+    // Use same coordinate system as obstacles: x * 6.66% (15 columns)
+    const visualX = position.x * 6.66;
+    const visualY = position.y * 6.66;
+
     return (
         <div
             className="absolute z-20"
             style={{
-                left: 0,
-                top: 0,
+                left: `${visualX}%`,
+                top: `${visualY}%`,
                 width: '6.66%', // 100/15
-                height: '6.66%',
-                transform: `translate(${position.x * 100}%, ${position.y * 100}%)`
+                height: '6.66%'
             }}
         >
             <svg viewBox="0 0 10 10" className={`w-full h-full ${direction === 'down' ? 'rotate-180' : direction === 'left' ? '-rotate-90' : direction === 'right' ? 'rotate-90' : ''}`}>

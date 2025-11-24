@@ -1,6 +1,6 @@
 import React from 'react';
 
-const GameOver = ({ won, time, lives, onShare }) => {
+const GameOver = ({ won, time, livesUsed, onShare }) => {
     return (
         <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center text-white z-50">
             <h2 className="text-4xl font-bold mb-4 text-center">
@@ -9,7 +9,7 @@ const GameOver = ({ won, time, lives, onShare }) => {
             {won && (
                 <div className="text-center mb-6">
                     <p className="text-xl">Time: {time.toFixed(2)}s</p>
-                    <p className="text-xl">Lives Left: {lives}</p>
+                    <p className="text-xl">Lives Used: {livesUsed}</p>
                 </div>
             )}
             <button

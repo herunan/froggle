@@ -7,10 +7,14 @@ import Frog from './Frog';
 import Controls from './Controls';
 import ScoreBoard from './ScoreBoard';
 import GameOver from './GameOver';
+import WastedOverlay from './WastedOverlay';
+
+const GAME_STATE_KEY = 'froggle-daily-state';
 
 const Game = () => {
-    const [gameState, setGameState] = useState('playing'); // playing, won, lost
-    const [lives, setLives] = useState(3);
+    const [gameState, setGameState] = useState('playing'); // playing, won
+    const [livesUsed, setLivesUsed] = useState(0);
+    const [showWasted, setShowWasted] = useState(false);
     const [time, setTime] = useState(0);
     const [frogPos, setFrogPos] = useState({ x: Math.floor(GRID_SIZE.cols / 2), y: GRID_SIZE.rows - 1 });
     const [lanes, setLanes] = useState([]);
@@ -18,6 +22,42 @@ const Game = () => {
     const requestRef = useRef();
     const previousTimeRef = useRef();
     const lanesRef = useRef([]); // Mutable ref for animation loop to avoid stale closures
+
+    // Load State
+    useEffect(() => {
+        const savedState = localStorage.getItem(GAME_STATE_KEY);
+        if (savedState) {
+            try {
+                const parsed = JSON.parse(savedState);
+                // Only restore if it's the same day (you might want to add a date check here in a real app)
+                // For now, we assume the daily seed handles the "same day" logic for the board,
+                // but we should probably check if the saved state belongs to today.
+                // Since the requirement is just "Safe state", we'll restore it.
+                // Ideally we'd store the date in the state and compare.
+                const today = new Date().toDateString();
+                if (parsed.date === today) {
+                    setLivesUsed(parsed.livesUsed || 0);
+                    setTime(parsed.time || 0);
+                    if (parsed.gameState === 'won') {
+                        setGameState('won');
+                    }
+                }
+            } catch (e) {
+                console.error("Failed to load state", e);
+            }
+        }
+    }, []);
+
+    // Save State
+    useEffect(() => {
+        const stateToSave = {
+            livesUsed,
+            time,
+            gameState,
+            date: new Date().toDateString()
+        };
+        localStorage.setItem(GAME_STATE_KEY, JSON.stringify(stateToSave));
+    }, [livesUsed, time, gameState]);
 
     // Initialize Game
     useEffect(() => {
@@ -141,7 +181,7 @@ const Game = () => {
     }, []);
 
     const handleMove = useCallback((direction) => {
-        if (gameState !== 'playing') return;
+        if (gameState !== 'playing' || showWasted) return;
 
         setFrogPos(prev => {
             const newPos = moveFrog(prev, direction);
@@ -163,7 +203,7 @@ const Game = () => {
             frogPosRef.current = newPos; // Sync ref immediately
             return newPos;
         });
-    }, [gameState]);
+    }, [gameState, showWasted]);
 
     // Keyboard controls
     useEffect(() => {
@@ -188,7 +228,7 @@ const Game = () => {
 
     // Game Loop
     const animate = (time) => {
-        if (gameState !== 'playing') return;
+        if (gameState !== 'playing' || showWasted) return;
 
         if (previousTimeRef.current !== undefined) {
             const deltaTime = (time - previousTimeRef.current) / 1000;
@@ -268,13 +308,14 @@ const Game = () => {
         const hit = isColliding(frogPos, currentLane.obstacles, currentLane.type);
 
         if (hit) {
-            // Die
-            if (lives > 1) {
-                setLives(l => l - 1);
-                setFrogPos({ x: Math.floor(GRID_SIZE.cols / 2), y: GRID_SIZE.rows - 1 });
-            } else {
-                setLives(0);
-                setGameState('lost');
+            // Die - Unlimited Lives
+            if (!showWasted) {
+                setLivesUsed(l => l + 1);
+                setShowWasted(true);
+                // Frog position reset is handled after Wasted screen or immediately?
+                // Requirement: "It does one flash, with wasted in red and B&W background."
+                // Usually in GTA you respawn after the wasted screen.
+                // We'll let the WastedOverlay handle the delay.
             }
         } else {
             // Even if on platform, check if it's a sinking turtle
@@ -282,18 +323,15 @@ const Game = () => {
                 const platform = findPlatformUnder(frogPos, currentLane.obstacles);
                 if (platform && platform.type === OBJECT_TYPES.TURTLE && platform.sinking) {
                     // Turtle is sinking - frog dies
-                    if (lives > 1) {
-                        setLives(l => l - 1);
-                        setFrogPos({ x: Math.floor(GRID_SIZE.cols / 2), y: GRID_SIZE.rows - 1 });
-                    } else {
-                        setLives(0);
-                        setGameState('lost');
+                    if (!showWasted) {
+                        setLivesUsed(l => l + 1);
+                        setShowWasted(true);
                     }
                 }
             }
         }
 
-    }, [frogPos, lanes, lives, gameState]);
+    }, [frogPos, lanes, livesUsed, gameState]);
 
     // Animation loop drift logic
     useEffect(() => {
@@ -308,8 +346,23 @@ const Game = () => {
         // I will leave the drift logic for the animation loop refactor.
     }, [gameState]);
 
+    const handleWastedComplete = () => {
+        setShowWasted(false);
+        setFrogPos({ x: Math.floor(GRID_SIZE.cols / 2), y: GRID_SIZE.rows - 1 });
+    };
+
     const handleShare = () => {
-        const text = `Froggle Daily ${new Date().toLocaleDateString()}\nScore: ${lives}/3 Lives\nTime: ${time.toFixed(2)}s\n\nPlay at: https://froggle-daily.surge.sh`;
+        const minutes = Math.floor(time / 60);
+        const seconds = Math.floor(time % 60);
+        const timeStr = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+        // Calculate Day # (Assuming Day 1 is Nov 24, 2025)
+        const startDate = new Date('2025-11-24T00:00:00Z');
+        const today = new Date();
+        const diffTime = Math.abs(today - startDate);
+        const dayNumber = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) || 1;
+
+        const text = `Froggle #${dayNumber}\n❤️ ${livesUsed}\n⏱️ ${timeStr}\n\nPlay at: https://froggle-daily.surge.sh`;
         navigator.clipboard.writeText(text).then(() => alert('Copied to clipboard!'));
     };
 
@@ -317,7 +370,7 @@ const Game = () => {
         <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 p-4 touch-none">
             <h1 className="text-4xl font-bold text-green-400 mb-4 font-pixel">FROGGLE</h1>
 
-            <ScoreBoard lives={lives} time={time} />
+            <ScoreBoard livesUsed={livesUsed} time={time} />
 
             <div
                 className="relative bg-black overflow-hidden shadow-2xl border-4 border-gray-700"
@@ -331,8 +384,10 @@ const Game = () => {
                 ))}
                 <Frog position={frogPos} direction={'up'} />
 
-                {(gameState === 'won' || gameState === 'lost') && (
-                    <GameOver won={gameState === 'won'} time={time} lives={lives} onShare={handleShare} />
+                {showWasted && <WastedOverlay onComplete={handleWastedComplete} />}
+
+                {gameState === 'won' && (
+                    <GameOver won={true} time={time} livesUsed={livesUsed} onShare={handleShare} />
                 )}
             </div>
 

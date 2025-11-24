@@ -3,8 +3,8 @@ import React, { useState, useEffect } from 'react';
 const Controls = ({ onMove }) => {
     const [activeKey, setActiveKey] = useState(null);
 
-    // Container rotated 45 degrees - no outer border, smaller size
-    const containerClass = "relative w-32 h-32 bg-gray-900 overflow-hidden rotate-45";
+    // Container rotated 45 degrees - no outer border, larger size
+    const containerClass = "relative w-48 h-48 bg-gray-900 overflow-hidden rotate-45";
 
     // Button base with conditional active state
     const getButtonClass = (direction) => {

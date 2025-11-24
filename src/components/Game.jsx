@@ -378,12 +378,10 @@ const Game = () => {
 
             <div className="flex-1 w-full flex items-center justify-center min-h-0 px-2 py-1">
                 <div
-                    className="relative bg-black overflow-hidden shadow-2xl border-4 border-gray-700 touch-none aspect-square"
+                    className="relative bg-black overflow-hidden shadow-2xl border-4 border-gray-700 touch-none"
                     style={{
-                        maxHeight: '100%',
-                        maxWidth: '100%',
-                        width: 'auto',
-                        height: 'auto'
+                        width: 'min(90vw, 55dvh, 500px)',
+                        height: 'min(90vw, 55dvh, 500px)', // Square aspect ratio
                     }}
                 >
                     {lanes.map(lane => (

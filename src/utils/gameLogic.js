@@ -1,8 +1,8 @@
 import { GRID_SIZE, OBJECT_SIZES, LANE_TYPES } from './constants';
 
 export const isColliding = (frog, obstacles, laneType) => {
-    // Add padding for tighter hitboxes (0.15 on each side = 30% smaller hitbox)
-    const HITBOX_PADDING = 0.15;
+    // Add padding for tighter hitboxes (0.05 on each side = 10% smaller hitbox, more forgiving)
+    const HITBOX_PADDING = 0.05;
 
     // Frog hitbox with padding
     const frogLeft = frog.x + HITBOX_PADDING;
@@ -57,7 +57,7 @@ export const moveFrog = (currentPos, direction) => {
 };
 
 export const findPlatformUnder = (frog, obstacles) => {
-    const HITBOX_PADDING = 0.15;
+    const HITBOX_PADDING = 0.05;
     const frogLeft = frog.x + HITBOX_PADDING;
     const frogRight = frog.x + 1 - HITBOX_PADDING;
 

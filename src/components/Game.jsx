@@ -231,7 +231,10 @@ const Game = () => {
         if (gameState !== 'playing' || showWasted) return;
 
         if (previousTimeRef.current !== undefined) {
-            const deltaTime = (time - previousTimeRef.current) / 1000;
+            let deltaTime = (time - previousTimeRef.current) / 1000;
+
+            // Cap deltaTime to prevent huge jumps (e.g. tab switching)
+            if (deltaTime > 0.1) deltaTime = 0.1;
 
             // Update time
             setTime(prev => prev + deltaTime);
@@ -362,18 +365,18 @@ const Game = () => {
         const diffTime = Math.abs(today - startDate);
         const dayNumber = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) || 1;
 
-        const text = `Froggle #${dayNumber}\n❤️ ${livesUsed}\n⏱️ ${timeStr}\n\nPlay at: https://froggle-daily.surge.sh`;
+        const text = `🐸 Froggle #${dayNumber}\n❤️ ${livesUsed}\n⏱️ ${timeStr}\nPlay at https://froggle-daily.surge.sh`;
         navigator.clipboard.writeText(text).then(() => alert('Copied to clipboard!'));
     };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 p-4 touch-none">
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 p-4">
             <h1 className="text-4xl font-bold text-green-400 mb-4 font-pixel">FROGGLE</h1>
 
             <ScoreBoard livesUsed={livesUsed} time={time} />
 
             <div
-                className="relative bg-black overflow-hidden shadow-2xl border-4 border-gray-700"
+                className="relative bg-black overflow-hidden shadow-2xl border-4 border-gray-700 touch-none"
                 style={{
                     width: 'min(90vw, 600px)',
                     height: 'min(90vw, 600px)', // Square aspect ratio

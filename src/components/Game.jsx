@@ -66,114 +66,216 @@ const Game = () => {
         let prevSpeed = null;
         let prevDirection = null;
 
-        // Generate Lanes
-        for (let i = 0; i < GRID_SIZE.rows; i++) {
-            let type = LANE_TYPES.SAFE;
-            let obstacles = [];
-            let speed = 0;
-            let direction = 1;
+        // Check for debug mode
+        const isDebugMode = new URLSearchParams(window.location.search).get('debug') === 'true';
 
-            if (i === 0) {
-                type = LANE_TYPES.GOAL;
-            } else if (i > 0 && i < 6) {
-                type = LANE_TYPES.RIVER;
+        if (isDebugMode) {
+            // DEBUG MODE: Show all obstacle types with easy spacing
+            console.log('🐸 DEBUG MODE ACTIVE');
 
-                // Prevent adjacent lanes with same speed AND direction (80% of the time)
-                const availableSpeeds = [SPEEDS.SLOW, SPEEDS.MEDIUM];
-                const availableDirections = [-1, 1];
+            for (let i = 0; i < GRID_SIZE.rows; i++) {
+                let type = LANE_TYPES.SAFE;
+                let obstacles = [];
+                let speed = 0;
+                let direction = 1;
 
-                // 80% chance to avoid same speed+direction as previous lane
-                if (prevSpeed !== null && rng.nextFloat() > 0.2) {
-                    // Try to vary either speed or direction
-                    if (rng.nextFloat() > 0.5) {
-                        // Vary direction
-                        direction = prevDirection === 1 ? -1 : 1;
-                        speed = rng.choice(availableSpeeds);
-                    } else {
-                        // Vary speed
-                        const filteredSpeeds = availableSpeeds.filter(s => s !== prevSpeed);
-                        speed = filteredSpeeds.length > 0 ? rng.choice(filteredSpeeds) : rng.choice(availableSpeeds);
-                        direction = rng.choice(availableDirections);
-                    }
-                } else {
-                    // 20% chance to be random (can be same)
-                    speed = rng.choice(availableSpeeds);
-                    direction = rng.choice(availableDirections);
+                if (i === 0) {
+                    type = LANE_TYPES.GOAL;
+                } else if (i === 1) {
+                    // Lilypad lane (stationary)
+                    type = LANE_TYPES.RIVER;
+                    speed = 0;
+                    obstacles = [
+                        { x: 2, type: OBJECT_TYPES.LILYPAD, width: 1 },
+                        { x: 5, type: OBJECT_TYPES.LILYPAD, width: 1 },
+                        { x: 8, type: OBJECT_TYPES.LILYPAD, width: 1 },
+                        { x: 11, type: OBJECT_TYPES.LILYPAD, width: 1 }
+                    ];
+                } else if (i === 2) {
+                    // Log lane (slow, moving right)
+                    type = LANE_TYPES.RIVER;
+                    speed = 1;
+                    direction = 1;
+                    obstacles = [
+                        { x: 0, type: OBJECT_TYPES.LOG, width: 3 },
+                        { x: 6, type: OBJECT_TYPES.LOG, width: 2 },
+                        { x: 10, type: OBJECT_TYPES.LOG, width: 3 }
+                    ];
+                } else if (i === 3) {
+                    // Turtle lane (slow, moving left)
+                    type = LANE_TYPES.RIVER;
+                    speed = 1;
+                    direction = -1;
+                    obstacles = [
+                        { x: 1, type: OBJECT_TYPES.TURTLE, width: 1, sinking: false, sinkCycle: 0 },
+                        { x: 5, type: OBJECT_TYPES.TURTLE, width: 1, sinking: false, sinkCycle: 50 },
+                        { x: 9, type: OBJECT_TYPES.TURTLE, width: 1, sinking: false, sinkCycle: 100 },
+                        { x: 12, type: OBJECT_TYPES.TURTLE, width: 1, sinking: false, sinkCycle: 150 }
+                    ];
+                } else if (i === 4) {
+                    // Mixed logs (slow, moving right)
+                    type = LANE_TYPES.RIVER;
+                    speed = 1;
+                    direction = 1;
+                    obstacles = [
+                        { x: 0, type: OBJECT_TYPES.LOG, width: 1 },
+                        { x: 4, type: OBJECT_TYPES.LOG, width: 2 },
+                        { x: 9, type: OBJECT_TYPES.LOG, width: 3 }
+                    ];
+                } else if (i === 5) {
+                    // Lilypad + Log mix (slow, moving left)
+                    type = LANE_TYPES.RIVER;
+                    speed = 1;
+                    direction = -1;
+                    obstacles = [
+                        { x: 2, type: OBJECT_TYPES.LILYPAD, width: 1 },
+                        { x: 6, type: OBJECT_TYPES.LOG, width: 2 },
+                        { x: 11, type: OBJECT_TYPES.LILYPAD, width: 1 }
+                    ];
+                } else if (i === 8) {
+                    // Car lane (slow, moving right)
+                    type = LANE_TYPES.ROAD;
+                    speed = 1;
+                    direction = 1;
+                    obstacles = [
+                        { x: 0, type: OBJECT_TYPES.CAR, width: 1 },
+                        { x: 5, type: OBJECT_TYPES.CAR, width: 1 },
+                        { x: 10, type: OBJECT_TYPES.CAR, width: 1 }
+                    ];
+                } else if (i === 9) {
+                    // Truck lane (slow, moving left)
+                    type = LANE_TYPES.ROAD;
+                    speed = 1;
+                    direction = -1;
+                    obstacles = [
+                        { x: 2, type: OBJECT_TYPES.TRUCK, width: 2 },
+                        { x: 8, type: OBJECT_TYPES.TRUCK, width: 2 }
+                    ];
+                } else if (i === 10) {
+                    // Mixed car/truck (slow, moving right)
+                    type = LANE_TYPES.ROAD;
+                    speed = 1;
+                    direction = 1;
+                    obstacles = [
+                        { x: 0, type: OBJECT_TYPES.CAR, width: 1 },
+                        { x: 4, type: OBJECT_TYPES.TRUCK, width: 2 },
+                        { x: 9, type: OBJECT_TYPES.CAR, width: 1 }
+                    ];
                 }
+                // i === 6, 7, 11, 12, 13, 14 are SAFE lanes
 
-                // Generate logs/turtles with variable lengths
-                const obsType = rng.choice([OBJECT_TYPES.LOG, OBJECT_TYPES.TURTLE, OBJECT_TYPES.LILYPAD]);
-                const count = rng.nextRange(2, 4);
-
-                for (let j = 0; j < count; j++) {
-                    let width = OBJECT_SIZES[obsType];
-
-                    // Variable log lengths (1, 2, or 3 blocks, but mostly 2)
-                    if (obsType === OBJECT_TYPES.LOG) {
-                        const lengthChoice = rng.nextFloat();
-                        if (lengthChoice < 0.2) {
-                            width = 1; // 20% chance
-                        } else if (lengthChoice < 0.85) {
-                            width = 2; // 65% chance
-                        } else {
-                            width = 3; // 15% chance
-                        }
-                    }
-
-                    obstacles.push({
-                        x: (j * (GRID_SIZE.cols / count)) + rng.nextRange(0, 2),
-                        type: obsType,
-                        width: width,
-                        // For turtles, add sinking state (starts visible)
-                        sinking: obsType === OBJECT_TYPES.TURTLE ? false : undefined,
-                        sinkCycle: obsType === OBJECT_TYPES.TURTLE ? rng.nextRange(0, 100) : undefined
-                    });
-                }
-
-                prevSpeed = speed;
-                prevDirection = direction;
-
-            } else if (i > 6 && i < 14) { // Extended road to row 13
-                type = LANE_TYPES.ROAD;
-
-                // Same logic for roads - prevent adjacent same speed+direction
-                const availableSpeeds = [SPEEDS.SLOW, SPEEDS.MEDIUM, SPEEDS.FAST];
-                const availableDirections = [-1, 1];
-
-                if (prevSpeed !== null && rng.nextFloat() > 0.2) {
-                    if (rng.nextFloat() > 0.5) {
-                        direction = prevDirection === 1 ? -1 : 1;
-                        speed = rng.choice(availableSpeeds);
-                    } else {
-                        const filteredSpeeds = availableSpeeds.filter(s => s !== prevSpeed);
-                        speed = filteredSpeeds.length > 0 ? rng.choice(filteredSpeeds) : rng.choice(availableSpeeds);
-                        direction = rng.choice(availableDirections);
-                    }
-                } else {
-                    speed = rng.choice(availableSpeeds);
-                    direction = rng.choice(availableDirections);
-                }
-
-                // Generate cars
-                const obsType = rng.choice([OBJECT_TYPES.CAR, OBJECT_TYPES.TRUCK]);
-                const count = rng.nextRange(2, 4);
-                for (let j = 0; j < count; j++) {
-                    obstacles.push({
-                        x: (j * (GRID_SIZE.cols / count)) + rng.nextRange(0, 2),
-                        type: obsType,
-                        width: OBJECT_SIZES[obsType]
-                    });
-                }
-
-                prevSpeed = speed;
-                prevDirection = direction;
-            } else {
-                // Reset for safe zones
-                prevSpeed = null;
-                prevDirection = null;
+                newLanes.push({ type, obstacles, speed, direction, id: i });
             }
+        } else {
+            // NORMAL MODE: Random generation
+            for (let i = 0; i < GRID_SIZE.rows; i++) {
+                let type = LANE_TYPES.SAFE;
+                let obstacles = [];
+                let speed = 0;
+                let direction = 1;
 
-            newLanes.push({ type, obstacles, speed, direction, id: i });
+                if (i === 0) {
+                    type = LANE_TYPES.GOAL;
+                } else if (i > 0 && i < 6) {
+                    type = LANE_TYPES.RIVER;
+
+                    // Prevent adjacent lanes with same speed AND direction (80% of the time)
+                    const availableSpeeds = [SPEEDS.SLOW, SPEEDS.MEDIUM];
+                    const availableDirections = [-1, 1];
+
+                    // 80% chance to avoid same speed+direction as previous lane
+                    if (prevSpeed !== null && rng.nextFloat() > 0.2) {
+                        // Try to vary either speed or direction
+                        if (rng.nextFloat() > 0.5) {
+                            // Vary direction
+                            direction = prevDirection === 1 ? -1 : 1;
+                            speed = rng.choice(availableSpeeds);
+                        } else {
+                            // Vary speed
+                            const filteredSpeeds = availableSpeeds.filter(s => s !== prevSpeed);
+                            speed = filteredSpeeds.length > 0 ? rng.choice(filteredSpeeds) : rng.choice(availableSpeeds);
+                            direction = rng.choice(availableDirections);
+                        }
+                    } else {
+                        // 20% chance to be random (can be same)
+                        speed = rng.choice(availableSpeeds);
+                        direction = rng.choice(availableDirections);
+                    }
+
+                    // Generate logs/turtles with variable lengths
+                    const obsType = rng.choice([OBJECT_TYPES.LOG, OBJECT_TYPES.TURTLE, OBJECT_TYPES.LILYPAD]);
+                    const count = rng.nextRange(2, 4);
+
+                    for (let j = 0; j < count; j++) {
+                        let width = OBJECT_SIZES[obsType];
+
+                        // Variable log lengths (1, 2, or 3 blocks, but mostly 2)
+                        if (obsType === OBJECT_TYPES.LOG) {
+                            const lengthChoice = rng.nextFloat();
+                            if (lengthChoice < 0.2) {
+                                width = 1; // 20% chance
+                            } else if (lengthChoice < 0.85) {
+                                width = 2; // 65% chance
+                            } else {
+                                width = 3; // 15% chance
+                            }
+                        }
+
+                        obstacles.push({
+                            x: (j * (GRID_SIZE.cols / count)) + rng.nextRange(0, 2),
+                            type: obsType,
+                            width: width,
+                            // For turtles, add sinking state (starts visible)
+                            sinking: obsType === OBJECT_TYPES.TURTLE ? false : undefined,
+                            sinkCycle: obsType === OBJECT_TYPES.TURTLE ? rng.nextRange(0, 100) : undefined
+                        });
+                    }
+
+                    prevSpeed = speed;
+                    prevDirection = direction;
+
+                } else if (i > 6 && i < 14) { // Extended road to row 13
+                    type = LANE_TYPES.ROAD;
+
+                    // Same logic for roads - prevent adjacent same speed+direction
+                    const availableSpeeds = [SPEEDS.SLOW, SPEEDS.MEDIUM, SPEEDS.FAST];
+                    const availableDirections = [-1, 1];
+
+                    if (prevSpeed !== null && rng.nextFloat() > 0.2) {
+                        if (rng.nextFloat() > 0.5) {
+                            direction = prevDirection === 1 ? -1 : 1;
+                            speed = rng.choice(availableSpeeds);
+                        } else {
+                            const filteredSpeeds = availableSpeeds.filter(s => s !== prevSpeed);
+                            speed = filteredSpeeds.length > 0 ? rng.choice(filteredSpeeds) : rng.choice(availableSpeeds);
+                            direction = rng.choice(availableDirections);
+                        }
+                    } else {
+                        speed = rng.choice(availableSpeeds);
+                        direction = rng.choice(availableDirections);
+                    }
+
+                    // Generate cars
+                    const obsType = rng.choice([OBJECT_TYPES.CAR, OBJECT_TYPES.TRUCK]);
+                    const count = rng.nextRange(2, 4);
+                    for (let j = 0; j < count; j++) {
+                        obstacles.push({
+                            x: (j * (GRID_SIZE.cols / count)) + rng.nextRange(0, 2),
+                            type: obsType,
+                            width: OBJECT_SIZES[obsType]
+                        });
+                    }
+
+                    prevSpeed = speed;
+                    prevDirection = direction;
+                } else {
+                    // Reset for safe zones
+                    prevSpeed = null;
+                    prevDirection = null;
+                }
+
+                newLanes.push({ type, obstacles, speed, direction, id: i });
+            }
         }
 
         setLanes(newLanes);

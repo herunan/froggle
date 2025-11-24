@@ -1,5 +1,6 @@
 import React from 'react';
 import { LANE_TYPES, OBJECT_TYPES } from '../utils/constants';
+import Obstacle from './Obstacle';
 
 const Lane = ({ type, obstacles, rowIndex }) => {
     const getBgColor = () => {
@@ -25,9 +26,9 @@ const Lane = ({ type, obstacles, rowIndex }) => {
                         transition: 'opacity 0.3s ease'
                     }}
                 >
-                    {/* Placeholder for sprites */}
-                    <div className={`w-full h-full p-1`}>
-                        <div className={`w-full h-full ${obs.type === OBJECT_TYPES.LOG ? 'bg-amber-800' : obs.type === OBJECT_TYPES.TURTLE ? 'bg-red-500' : obs.type === OBJECT_TYPES.CAR ? 'bg-yellow-500' : obs.type === OBJECT_TYPES.TRUCK ? 'bg-orange-600' : 'bg-white'}`}></div>
+                    {/* Render Obstacle SVG */}
+                    <div className="w-full h-full p-[2px]">
+                        <Obstacle type={obs.type} width={obs.width} />
                     </div>
                 </div>
             ))}

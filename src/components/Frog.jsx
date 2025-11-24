@@ -26,10 +26,32 @@ const Frog = ({ position, direction }) => {
                 height: '6.66%'
             }}
         >
-            <svg viewBox="0 0 10 10" className={`w-full h-full ${direction === 'down' ? 'rotate-180' : direction === 'left' ? '-rotate-90' : direction === 'right' ? 'rotate-90' : ''}`}>
-                <rect x="2" y="2" width="6" height="6" fill="#4ade80" />
-                <rect x="3" y="3" width="1" height="1" fill="black" />
-                <rect x="6" y="3" width="1" height="1" fill="black" />
+            <svg viewBox="0 0 100 100" className={`w-full h-full drop-shadow-sm ${direction === 'down' ? 'rotate-180' : direction === 'left' ? '-rotate-90' : direction === 'right' ? 'rotate-90' : ''}`}>
+                {/* Back Legs (Splayed) */}
+                <path d="M10 70 Q 5 50 25 50 L 30 60" stroke="#15803d" strokeWidth="8" fill="none" strokeLinecap="round" />
+                <path d="M90 70 Q 95 50 75 50 L 70 60" stroke="#15803d" strokeWidth="8" fill="none" strokeLinecap="round" />
+
+                {/* Front Legs */}
+                <path d="M30 30 L 15 20" stroke="#15803d" strokeWidth="6" fill="none" strokeLinecap="round" />
+                <path d="M70 30 L 85 20" stroke="#15803d" strokeWidth="6" fill="none" strokeLinecap="round" />
+
+                {/* Body (Main shape) */}
+                <ellipse cx="50" cy="55" rx="25" ry="30" fill="#4ade80" />
+
+                {/* Head Area (Slightly smaller, on top) */}
+                <ellipse cx="50" cy="35" rx="20" ry="15" fill="#4ade80" />
+
+                {/* Eyes (Bulging) */}
+                <circle cx="35" cy="25" r="6" fill="#4ade80" stroke="#15803d" strokeWidth="1" />
+                <circle cx="65" cy="25" r="6" fill="#4ade80" stroke="#15803d" strokeWidth="1" />
+
+                {/* Pupils */}
+                <circle cx="35" cy="25" r="2" fill="black" />
+                <circle cx="65" cy="25" r="2" fill="black" />
+
+                {/* Back Pattern (Stripes/Spots) */}
+                <path d="M40 60 L 60 60" stroke="#15803d" strokeWidth="3" opacity="0.5" />
+                <path d="M45 70 L 55 70" stroke="#15803d" strokeWidth="3" opacity="0.5" />
             </svg>
         </div>
     );

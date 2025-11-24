@@ -1,61 +1,54 @@
 import React from 'react';
 
 const Controls = ({ onMove }) => {
-    // D-pad styling to match the image (Circular with cross)
-    const containerClass = "relative w-56 h-56 bg-gray-800 rounded-full shadow-[0_10px_20px_rgba(0,0,0,0.5),inset_0_-5px_10px_rgba(0,0,0,0.3)] flex items-center justify-center border-4 border-gray-700";
-    const crossClass = "relative w-full h-full";
+    // Container rotated 45 degrees to turn the grid into a diamond/circle wedges
+    const containerClass = "relative w-48 h-48 bg-gray-900 rounded-full border border-gray-800 overflow-hidden rotate-45";
 
-    // Button base styles - using absolute positioning to form the cross
-    const btnBase = "absolute bg-gray-600 hover:bg-gray-500 active:bg-gray-400 text-gray-200 flex items-center justify-center text-3xl transition-colors touch-manipulation select-none shadow-[inset_0_2px_5px_rgba(255,255,255,0.1),0_5px_0_rgba(0,0,0,0.3)] active:shadow-none active:translate-y-1";
+    // Button base: fills the quadrant, flex center - minimal styling
+    const btnBase = "w-full h-full flex items-center justify-center text-3xl text-gray-400 active:text-gray-300 touch-manipulation select-none outline-none bg-gray-900";
 
-    // Dimensions for the cross arms
-    const vArmClass = "w-16 h-20 left-1/2 -translate-x-1/2";
-    const hArmClass = "h-16 w-20 top-1/2 -translate-y-1/2";
+    // Icon rotation to counteract container rotation (-45deg)
+    const iconClass = "-rotate-45";
 
     return (
-        <div className="flex justify-center mt-8 mb-12">
+        <div className="flex justify-center mb-4">
             <div className={containerClass}>
-                <div className={crossClass}>
-                    {/* Up */}
+                <div className="grid grid-cols-2 grid-rows-2 w-full h-full">
+                    {/* Top-Left Quadrant -> UP */}
                     <button
-                        className={`${btnBase} ${vArmClass} top-4 rounded-t-xl rounded-b-sm`}
+                        className={`${btnBase} border-r border-b border-gray-800`}
                         onClick={() => onMove('up')}
                         aria-label="Move Up"
                     >
-                        ▲
+                        <span className={iconClass}>▲</span>
                     </button>
 
-                    {/* Down */}
+                    {/* Top-Right Quadrant -> RIGHT */}
                     <button
-                        className={`${btnBase} ${vArmClass} bottom-4 rounded-b-xl rounded-t-sm`}
-                        onClick={() => onMove('down')}
-                        aria-label="Move Down"
-                    >
-                        ▼
-                    </button>
-
-                    {/* Left */}
-                    <button
-                        className={`${btnBase} ${hArmClass} left-4 rounded-l-xl rounded-r-sm`}
-                        onClick={() => onMove('left')}
-                        aria-label="Move Left"
-                    >
-                        ◀
-                    </button>
-
-                    {/* Right */}
-                    <button
-                        className={`${btnBase} ${hArmClass} right-4 rounded-r-xl rounded-l-sm`}
+                        className={`${btnBase} border-b border-gray-800`}
                         onClick={() => onMove('right')}
                         aria-label="Move Right"
                     >
-                        ▶
+                        <span className={iconClass}>▶</span>
                     </button>
 
-                    {/* Center Pivot (Decorative) */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-gray-600 rounded-sm shadow-[inset_0_0_10px_rgba(0,0,0,0.2)] pointer-events-none z-10">
-                        <div className="w-full h-full rounded-full bg-gradient-to-br from-gray-500 to-gray-700 opacity-50 scale-75"></div>
-                    </div>
+                    {/* Bottom-Left Quadrant -> LEFT */}
+                    <button
+                        className={`${btnBase} border-r border-gray-800`}
+                        onClick={() => onMove('left')}
+                        aria-label="Move Left"
+                    >
+                        <span className={iconClass}>◀</span>
+                    </button>
+
+                    {/* Bottom-Right Quadrant -> DOWN */}
+                    <button
+                        className={`${btnBase}`}
+                        onClick={() => onMove('down')}
+                        aria-label="Move Down"
+                    >
+                        <span className={iconClass}>▼</span>
+                    </button>
                 </div>
             </div>
         </div>

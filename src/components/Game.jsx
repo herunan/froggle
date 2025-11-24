@@ -370,28 +370,31 @@ const Game = () => {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 p-4">
-            <h1 className="text-4xl font-bold text-green-400 mb-4 font-pixel">FROGGLE</h1>
+        <div className="flex flex-col items-center justify-between h-screen bg-gray-900 p-2 overflow-hidden">
+            <div className="flex flex-col items-center">
+                <h1 className="text-3xl md:text-4xl font-bold text-green-400 mb-2 font-pixel">FROGGLE</h1>
+                <ScoreBoard livesUsed={livesUsed} time={time} />
+            </div>
 
-            <ScoreBoard livesUsed={livesUsed} time={time} />
+            <div className="flex-shrink flex items-center justify-center">
+                <div
+                    className="relative bg-black overflow-hidden shadow-2xl border-4 border-gray-700 touch-none"
+                    style={{
+                        width: 'min(85vw, 500px)',
+                        height: 'min(85vw, 500px)', // Square aspect ratio
+                    }}
+                >
+                    {lanes.map(lane => (
+                        <Lane key={lane.id} {...lane} rowIndex={lane.id} />
+                    ))}
+                    <Frog position={frogPos} direction={'up'} />
 
-            <div
-                className="relative bg-black overflow-hidden shadow-2xl border-4 border-gray-700 touch-none"
-                style={{
-                    width: 'min(90vw, 600px)',
-                    height: 'min(90vw, 600px)', // Square aspect ratio
-                }}
-            >
-                {lanes.map(lane => (
-                    <Lane key={lane.id} {...lane} rowIndex={lane.id} />
-                ))}
-                <Frog position={frogPos} direction={'up'} />
+                    {showWasted && <WastedOverlay onComplete={handleWastedComplete} />}
 
-                {showWasted && <WastedOverlay onComplete={handleWastedComplete} />}
-
-                {gameState === 'won' && (
-                    <GameOver won={true} time={time} livesUsed={livesUsed} onShare={handleShare} />
-                )}
+                    {gameState === 'won' && (
+                        <GameOver won={true} time={time} livesUsed={livesUsed} onShare={handleShare} />
+                    )}
+                </div>
             </div>
 
             <Controls onMove={handleMove} />

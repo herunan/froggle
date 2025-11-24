@@ -1,4 +1,3 @@
-```javascript
 import React from 'react';
 
 const WastedOverlay = ({ onComplete }) => {
@@ -18,4 +17,3 @@ const WastedOverlay = ({ onComplete }) => {
 };
 
 export default WastedOverlay;
-```

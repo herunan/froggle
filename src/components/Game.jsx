@@ -370,18 +370,20 @@ const Game = () => {
     };
 
     return (
-        <div className="flex flex-col items-center justify-between h-screen bg-gray-900 overflow-hidden">
-            <div className="flex flex-col items-center w-full -mb-2">
-                <h1 className="text-3xl md:text-4xl font-bold text-green-400 font-pixel">FROGGLE</h1>
+        <div className="flex flex-col items-center justify-between h-[100dvh] bg-gray-900 overflow-hidden">
+            <div className="flex flex-col items-center w-full pt-2 px-2 flex-shrink-0">
+                <h1 className="text-3xl md:text-4xl font-bold text-green-400 mb-0 font-pixel">FROGGLE</h1>
                 <ScoreBoard livesUsed={livesUsed} time={time} />
             </div>
 
-            <div className="flex-shrink flex items-center justify-center -my-2">
+            <div className="flex-1 w-full flex items-center justify-center min-h-0 px-2 py-1">
                 <div
-                    className="relative bg-black overflow-hidden shadow-2xl border-4 border-gray-700 touch-none"
+                    className="relative bg-black overflow-hidden shadow-2xl border-4 border-gray-700 touch-none aspect-square"
                     style={{
-                        width: 'min(85vw, 500px)',
-                        height: 'min(85vw, 500px)', // Square aspect ratio
+                        maxHeight: '100%',
+                        maxWidth: '100%',
+                        width: 'auto',
+                        height: 'auto'
                     }}
                 >
                     {lanes.map(lane => (
@@ -397,7 +399,9 @@ const Game = () => {
                 </div>
             </div>
 
-            <Controls onMove={handleMove} />
+            <div className="flex-shrink-0 w-full pb-safe mb-1">
+                <Controls onMove={handleMove} />
+            </div>
         </div>
     );
 };

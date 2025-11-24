@@ -370,13 +370,13 @@ const Game = () => {
     };
 
     return (
-        <div className="flex flex-col items-center justify-between h-screen bg-gray-900 p-2 overflow-hidden">
-            <div className="flex flex-col items-center">
-                <h1 className="text-3xl md:text-4xl font-bold text-green-400 mb-2 font-pixel">FROGGLE</h1>
+        <div className="flex flex-col items-center h-screen bg-gray-900 overflow-hidden">
+            <div className="flex flex-col items-center pt-2">
+                <h1 className="text-3xl md:text-4xl font-bold text-green-400 mb-1 font-pixel">FROGGLE</h1>
                 <ScoreBoard livesUsed={livesUsed} time={time} />
             </div>
 
-            <div className="flex-shrink flex items-center justify-center">
+            <div className="flex-1 flex items-center justify-center min-h-0 w-full">
                 <div
                     className="relative bg-black overflow-hidden shadow-2xl border-4 border-gray-700 touch-none"
                     style={{
@@ -397,7 +397,9 @@ const Game = () => {
                 </div>
             </div>
 
-            <Controls onMove={handleMove} />
+            <div className="pb-2">
+                <Controls onMove={handleMove} />
+            </div>
         </div>
     );
 };

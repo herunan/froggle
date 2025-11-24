@@ -1,19 +1,30 @@
 import { GRID_SIZE, OBJECT_SIZES, LANE_TYPES } from './constants';
 
 export const isColliding = (frog, obstacles, laneType) => {
-    // Add padding for tighter hitboxes (0.05 on each side = 10% smaller hitbox, more forgiving)
-    const HITBOX_PADDING = 0.05;
+    // Dynamic padding based on lane type
+    // River: 0.0 (or slightly negative) to make landing SAFE even on edges
+    // Road: 0.2 to make dodging EASIER (smaller car hitboxes)
+    let padding = 0.05; // Default
 
-    // Frog hitbox with padding
-    const frogLeft = frog.x + HITBOX_PADDING;
-    const frogRight = frog.x + 1 - HITBOX_PADDING;
+    if (laneType === LANE_TYPES.RIVER) {
+        padding = 0.0; // Touching the edge is SAFE
+    } else if (laneType === LANE_TYPES.ROAD) {
+        padding = 0.2; // Hitbox is 40% smaller (0.2 from each side), easier to dodge
+    }
+
+    // Frog hitbox - keep it standard or slightly forgiving?
+    // Let's keep frog standard (1x1) but apply padding to the interaction logic above effectively
+    // Actually, applying padding to the *check* is cleaner.
+
+    const frogLeft = frog.x + padding;
+    const frogRight = frog.x + 1 - padding;
 
     for (const obs of obstacles) {
         const obsWidth = OBJECT_SIZES[obs.type] || 1;
 
-        // Obstacle hitbox with padding
-        const obsLeft = obs.x + HITBOX_PADDING;
-        const obsRight = obs.x + obsWidth - HITBOX_PADDING;
+        // Obstacle hitbox
+        const obsLeft = obs.x + padding;
+        const obsRight = obs.x + obsWidth - padding;
 
         // Check horizontal overlap
         const overlap = frogLeft < obsRight && frogRight > obsLeft;
@@ -57,14 +68,16 @@ export const moveFrog = (currentPos, direction) => {
 };
 
 export const findPlatformUnder = (frog, obstacles) => {
-    const HITBOX_PADDING = 0.05;
-    const frogLeft = frog.x + HITBOX_PADDING;
-    const frogRight = frog.x + 1 - HITBOX_PADDING;
+    // Match the RIVER padding from isColliding (0.0)
+    const padding = 0.0;
+
+    const frogLeft = frog.x + padding;
+    const frogRight = frog.x + 1 - padding;
 
     for (const obs of obstacles) {
         const obsWidth = OBJECT_SIZES[obs.type] || 1;
-        const obsLeft = obs.x + HITBOX_PADDING;
-        const obsRight = obs.x + obsWidth - HITBOX_PADDING;
+        const obsLeft = obs.x + padding;
+        const obsRight = obs.x + obsWidth - padding;
 
         // Check if frog is on this platform
         const overlap = frogLeft < obsRight && frogRight > obsLeft;

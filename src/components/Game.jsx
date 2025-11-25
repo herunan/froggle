@@ -231,6 +231,24 @@ const Game = () => {
                         });
                     }
 
+                    // Validate coverage - ensure the lane is solvable
+                    // Calculate total platform width
+                    const totalPlatformWidth = obstacles.reduce((sum, obs) => sum + (obs.width || 1), 0);
+                    const coverageRatio = totalPlatformWidth / GRID_SIZE.cols;
+
+                    // If coverage is too low (less than 40%), add more platforms
+                    if (coverageRatio < 0.4) {
+                        const additionalPlatforms = Math.ceil((0.4 * GRID_SIZE.cols - totalPlatformWidth) / 2);
+                        for (let k = 0; k < additionalPlatforms; k++) {
+                            obstacles.push({
+                                x: rng.nextRange(0, GRID_SIZE.cols - 2),
+                                type: OBJECT_TYPES.LOG,
+                                width: 2,
+                                sinking: false
+                            });
+                        }
+                    }
+
                     prevSpeed = speed;
                     prevDirection = direction;
 

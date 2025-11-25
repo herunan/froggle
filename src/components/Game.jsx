@@ -179,32 +179,48 @@ const Game = () => {
                 } else if (i > 0 && i < 6) {
                     type = LANE_TYPES.RIVER;
 
-                    // Prevent adjacent lanes with same speed AND direction (80% of the time)
+                    // Adjacent lanes must share either speed OR direction (not both different)
                     const availableSpeeds = [SPEEDS.SLOW, SPEEDS.MEDIUM];
                     const availableDirections = [-1, 1];
 
-                    // 80% chance to avoid same speed+direction as previous lane
-                    if (prevSpeed !== null && rng.nextFloat() > 0.2) {
-                        // Try to vary either speed or direction
+                    if (prevSpeed !== null) {
+                        // Randomly choose to vary speed OR direction, but not both
                         if (rng.nextFloat() > 0.5) {
-                            // Vary direction
+                            // Keep same speed, vary direction
+                            speed = prevSpeed;
                             direction = prevDirection === 1 ? -1 : 1;
-                            speed = rng.choice(availableSpeeds);
                         } else {
-                            // Vary speed
+                            // Keep same direction, vary speed
+                            direction = prevDirection;
                             const filteredSpeeds = availableSpeeds.filter(s => s !== prevSpeed);
                             speed = filteredSpeeds.length > 0 ? rng.choice(filteredSpeeds) : rng.choice(availableSpeeds);
-                            direction = rng.choice(availableDirections);
                         }
                     } else {
-                        // 20% chance to be random (can be same)
+                        // First river lane - random
                         speed = rng.choice(availableSpeeds);
                         direction = rng.choice(availableDirections);
                     }
 
-                    // Generate logs/turtles with variable lengths
+                    // ONE obstacle type per lane
                     const obsType = rng.choice([OBJECT_TYPES.LOG, OBJECT_TYPES.TURTLE, OBJECT_TYPES.LILYPAD]);
                     const count = rng.nextRange(2, 4);
+
+                    // Helper to check if obstacle overlaps with existing ones
+                    const checkOverlap = (newObs, existingObs) => {
+                        const newLeft = newObs.x;
+                        const newRight = newObs.x + newObs.width;
+
+                        for (const obs of existingObs) {
+                            const obsLeft = obs.x;
+                            const obsRight = obs.x + obs.width;
+
+                            // Check if ranges overlap
+                            if (newLeft < obsRight && newRight > obsLeft) {
+                                return true; // Overlap detected
+                            }
+                        }
+                        return false; // No overlap
+                    };
 
                     for (let j = 0; j < count; j++) {
                         let width = OBJECT_SIZES[obsType];
@@ -221,31 +237,29 @@ const Game = () => {
                             }
                         }
 
-                        obstacles.push({
-                            x: (j * (GRID_SIZE.cols / count)) + rng.nextRange(0, 2),
-                            type: obsType,
-                            width: width,
-                            // For turtles, add sinking state (starts visible)
-                            sinking: obsType === OBJECT_TYPES.TURTLE ? false : undefined,
-                            sinkCycle: obsType === OBJECT_TYPES.TURTLE ? rng.nextRange(0, 100) : undefined
-                        });
-                    }
+                        // Try to find a non-overlapping position
+                        let attempts = 0;
+                        let validPosition = false;
+                        let newObstacle;
 
-                    // Validate coverage - ensure the lane is solvable
-                    // Calculate total platform width
-                    const totalPlatformWidth = obstacles.reduce((sum, obs) => sum + (obs.width || 1), 0);
-                    const coverageRatio = totalPlatformWidth / GRID_SIZE.cols;
+                        while (!validPosition && attempts < 10) {
+                            const baseX = (j * (GRID_SIZE.cols / count)) + rng.nextRange(0, 2);
+                            newObstacle = {
+                                x: Math.max(0, Math.min(GRID_SIZE.cols - width, baseX)),
+                                type: obsType,
+                                width: width,
+                                sinking: obsType === OBJECT_TYPES.TURTLE ? false : undefined,
+                                sinkCycle: obsType === OBJECT_TYPES.TURTLE ? rng.nextRange(0, 100) : undefined
+                            };
 
-                    // If coverage is too low (less than 40%), add more platforms
-                    if (coverageRatio < 0.4) {
-                        const additionalPlatforms = Math.ceil((0.4 * GRID_SIZE.cols - totalPlatformWidth) / 2);
-                        for (let k = 0; k < additionalPlatforms; k++) {
-                            obstacles.push({
-                                x: rng.nextRange(0, GRID_SIZE.cols - 2),
-                                type: OBJECT_TYPES.LOG,
-                                width: 2,
-                                sinking: false
-                            });
+                            if (!checkOverlap(newObstacle, obstacles)) {
+                                validPosition = true;
+                            }
+                            attempts++;
+                        }
+
+                        if (validPosition) {
+                            obstacles.push(newObstacle);
                         }
                     }
 
@@ -255,33 +269,74 @@ const Game = () => {
                 } else if (i > 6 && i < 14) { // Extended road to row 13
                     type = LANE_TYPES.ROAD;
 
-                    // Same logic for roads - prevent adjacent same speed+direction
+                    // Adjacent lanes must share either speed OR direction (not both different)
                     const availableSpeeds = [SPEEDS.SLOW, SPEEDS.MEDIUM, SPEEDS.FAST];
                     const availableDirections = [-1, 1];
 
-                    if (prevSpeed !== null && rng.nextFloat() > 0.2) {
+                    if (prevSpeed !== null) {
+                        // Randomly choose to vary speed OR direction, but not both
                         if (rng.nextFloat() > 0.5) {
+                            // Keep same speed, vary direction
+                            speed = prevSpeed;
                             direction = prevDirection === 1 ? -1 : 1;
-                            speed = rng.choice(availableSpeeds);
                         } else {
+                            // Keep same direction, vary speed
+                            direction = prevDirection;
                             const filteredSpeeds = availableSpeeds.filter(s => s !== prevSpeed);
                             speed = filteredSpeeds.length > 0 ? rng.choice(filteredSpeeds) : rng.choice(availableSpeeds);
-                            direction = rng.choice(availableDirections);
                         }
                     } else {
+                        // First road lane - random
                         speed = rng.choice(availableSpeeds);
                         direction = rng.choice(availableDirections);
                     }
 
-                    // Generate cars
+                    // ONE obstacle type per lane
                     const obsType = rng.choice([OBJECT_TYPES.CAR, OBJECT_TYPES.TRUCK]);
                     const count = rng.nextRange(2, 4);
+
+                    // Helper to check if obstacle overlaps with existing ones
+                    const checkOverlap = (newObs, existingObs) => {
+                        const newLeft = newObs.x;
+                        const newRight = newObs.x + newObs.width;
+
+                        for (const obs of existingObs) {
+                            const obsLeft = obs.x;
+                            const obsRight = obs.x + obs.width;
+
+                            // Check if ranges overlap
+                            if (newLeft < obsRight && newRight > obsLeft) {
+                                return true; // Overlap detected
+                            }
+                        }
+                        return false; // No overlap
+                    };
+
                     for (let j = 0; j < count; j++) {
-                        obstacles.push({
-                            x: (j * (GRID_SIZE.cols / count)) + rng.nextRange(0, 2),
-                            type: obsType,
-                            width: OBJECT_SIZES[obsType]
-                        });
+                        const width = OBJECT_SIZES[obsType];
+
+                        // Try to find a non-overlapping position
+                        let attempts = 0;
+                        let validPosition = false;
+                        let newObstacle;
+
+                        while (!validPosition && attempts < 10) {
+                            const baseX = (j * (GRID_SIZE.cols / count)) + rng.nextRange(0, 2);
+                            newObstacle = {
+                                x: Math.max(0, Math.min(GRID_SIZE.cols - width, baseX)),
+                                type: obsType,
+                                width: width
+                            };
+
+                            if (!checkOverlap(newObstacle, obstacles)) {
+                                validPosition = true;
+                            }
+                            attempts++;
+                        }
+
+                        if (validPosition) {
+                            obstacles.push(newObstacle);
+                        }
                     }
 
                     prevSpeed = speed;

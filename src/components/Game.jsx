@@ -9,7 +9,7 @@ import ScoreBoard from './ScoreBoard';
 import GameOver from './GameOver';
 import WastedOverlay from './WastedOverlay';
 
-const GAME_STATE_KEY = 'froggle-daily-state';
+const GAME_STATE_KEY = 'froggle-daily-state-v2';
 
 const Game = () => {
     const [gameState, setGameState] = useState('playing'); // playing, won

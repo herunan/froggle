@@ -11,11 +11,11 @@ const Frog = ({ position, direction }) => {
         height: `${100 / 15}%`, // 1/15th of the height
     };
 
+    // Simple SVG Frog
     // Use same coordinate system as obstacles: x * 6.66% (15 columns)
     const visualX = position.x * 6.66;
     const visualY = position.y * 6.66;
 
-    // GBC Frog Sprite
     return (
         <div
             className="absolute z-20"
@@ -26,31 +26,10 @@ const Frog = ({ position, direction }) => {
                 height: '6.66%'
             }}
         >
-            <svg viewBox="0 0 16 16" style={{ shapeRendering: 'crispEdges' }} className={`w-full h-full ${direction === 'down' ? 'rotate-180' : direction === 'left' ? '-rotate-90' : direction === 'right' ? 'rotate-90' : ''}`}>
-                {/* Shadow */}
-                <rect x="2" y="13" width="12" height="2" fill="rgba(0,0,0,0.3)" />
-
-                {/* Back Legs */}
-                <rect x="1" y="8" width="3" height="5" fill="#306230" />
-                <rect x="12" y="8" width="3" height="5" fill="#306230" />
-
-                {/* Body */}
-                <rect x="4" y="3" width="8" height="10" fill="#8bac0f" />
-                <rect x="4" y="3" width="8" height="1" fill="#9bbc0f" /> {/* Highlight */}
-
-                {/* Head/Eyes */}
-                <rect x="4" y="2" width="3" height="3" fill="#8bac0f" />
-                <rect x="9" y="2" width="3" height="3" fill="#8bac0f" />
-                <rect x="5" y="3" width="1" height="1" fill="black" />
-                <rect x="10" y="3" width="1" height="1" fill="black" />
-
-                {/* Front Legs */}
-                <rect x="2" y="4" width="2" height="3" fill="#8bac0f" />
-                <rect x="12" y="4" width="2" height="3" fill="#8bac0f" />
-
-                {/* Back Spots */}
-                <rect x="6" y="7" width="1" height="1" fill="#306230" />
-                <rect x="9" y="9" width="1" height="1" fill="#306230" />
+            <svg viewBox="0 0 10 10" className={`w-full h-full ${direction === 'down' ? 'rotate-180' : direction === 'left' ? '-rotate-90' : direction === 'right' ? 'rotate-90' : ''}`}>
+                <rect x="2" y="2" width="6" height="6" fill="#4ade80" />
+                <rect x="3" y="3" width="1" height="1" fill="black" />
+                <rect x="6" y="3" width="1" height="1" fill="black" />
             </svg>
         </div>
     );

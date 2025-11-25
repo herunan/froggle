@@ -1,24 +1,18 @@
 import React from 'react';
 import { LANE_TYPES, OBJECT_TYPES } from '../utils/constants';
-import Sprite from './Sprite';
 
-const Lane = ({ type, obstacles, rowIndex, direction }) => {
+const Lane = ({ type, obstacles, rowIndex }) => {
     const getBgColor = () => {
         switch (type) {
-            case LANE_TYPES.ROAD: return 'bg-[#2d2d2d]'; // Dark asphalt
-            case LANE_TYPES.RIVER: return 'bg-[#4fa4b8]'; // GBC Water
-            case LANE_TYPES.GOAL: return 'bg-[#306230]'; // GBC Green
-            default: return 'bg-[#306230]'; // Safe zone (Grass)
+            case LANE_TYPES.ROAD: return 'bg-gray-800';
+            case LANE_TYPES.RIVER: return 'bg-blue-500';
+            case LANE_TYPES.GOAL: return 'bg-green-800';
+            default: return 'bg-gray-900'; // Safe zone
         }
     };
 
     return (
         <div className={`relative w-full h-[6.66%] ${getBgColor()} overflow-hidden border-b border-black/10`}>
-            {/* Lane Texture/Detail could go here */}
-            {type === LANE_TYPES.SAFE && (
-                <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(#0f380f 1px, transparent 1px)', backgroundSize: '10px 10px' }}></div>
-            )}
-
             {/* Render obstacles */}
             {obstacles.map((obs, i) => (
                 <div
@@ -31,12 +25,16 @@ const Lane = ({ type, obstacles, rowIndex, direction }) => {
                         transition: 'opacity 0.3s ease'
                     }}
                 >
-                    <Sprite
-                        type={obs.type}
-                        width={obs.width || 1}
-                        direction={direction}
-                        sinking={obs.sinking}
-                    />
+                    {/* Placeholder for sprites */}
+                    <div className={`w-full h-full p-1`}>
+                        <div className={`w-full h-full ${obs.type === OBJECT_TYPES.LOG ? 'bg-amber-800' :
+                                obs.type === OBJECT_TYPES.TURTLE ? 'bg-green-800' :
+                                    obs.type === OBJECT_TYPES.LILYPAD ? 'bg-green-500' :
+                                        obs.type === OBJECT_TYPES.CAR ? 'bg-red-500' :
+                                            obs.type === OBJECT_TYPES.TRUCK ? 'bg-yellow-500' :
+                                                'bg-white'
+                            }`}></div>
+                    </div>
                 </div>
             ))}
         </div>

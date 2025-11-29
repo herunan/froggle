@@ -530,7 +530,10 @@ const Game = () => {
         const diffTime = Math.abs(today - startDate);
         const dayNumber = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) || 1;
 
-        const text = `🐸 Froggle #${dayNumber}\n❤️ ${livesUsed}\n⏱️ ${timeStr}\nPlay at https://froggle-daily.surge.sh`;
+        const isMobile = window.innerWidth < 768;
+        const mobileTag = isMobile ? ' 📱 Mobile' : '';
+
+        const text = `🐸 Froggle #${dayNumber}${mobileTag}\n❤️ ${livesUsed}\n⏱️ ${timeStr}\nPlay at https://froggle-daily.surge.sh`;
         navigator.clipboard.writeText(text).then(() => alert('Copied to clipboard!'));
     };
 

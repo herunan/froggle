@@ -28,11 +28,11 @@ const Lane = ({ type, obstacles, rowIndex }) => {
                     {/* Placeholder for sprites */}
                     <div className={`w-full h-full p-1`}>
                         <div className={`w-full h-full ${obs.type === OBJECT_TYPES.LOG ? 'bg-amber-800' :
-                                obs.type === OBJECT_TYPES.TURTLE ? 'bg-green-800' :
-                                    obs.type === OBJECT_TYPES.LILYPAD ? 'bg-green-500' :
-                                        obs.type === OBJECT_TYPES.CAR ? 'bg-red-500' :
-                                            obs.type === OBJECT_TYPES.TRUCK ? 'bg-yellow-500' :
-                                                'bg-white'
+                            obs.type === OBJECT_TYPES.TURTLE ? 'bg-green-800' :
+                                obs.type === OBJECT_TYPES.LILYPAD ? 'bg-green-500' :
+                                    obs.type === OBJECT_TYPES.CAR ? 'bg-red-500' :
+                                        obs.type === OBJECT_TYPES.TRUCK ? 'bg-yellow-500' :
+                                            'bg-white'
                             }`}></div>
                     </div>
                 </div>

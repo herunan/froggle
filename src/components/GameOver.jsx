@@ -7,8 +7,8 @@ const GameOver = ({ won, time, livesUsed, onShare, onTryAgain }) => {
         const updateCountdown = () => {
             const now = new Date();
             const tomorrow = new Date(now);
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            tomorrow.setHours(0, 0, 0, 0); // Midnight
+            tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
+            tomorrow.setUTCHours(0, 0, 0, 0); // UTC Midnight
 
             const diff = tomorrow - now;
             const hours = Math.floor(diff / (1000 * 60 * 60));

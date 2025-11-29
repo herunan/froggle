@@ -3,8 +3,7 @@ import React from 'react';
 const ScoreBoard = ({ livesUsed, time }) => {
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);
-    const milliseconds = Math.floor((time % 1) * 10); // Get tenths of a second
-    const timeStr = `${minutes}:${seconds.toString().padStart(2, '0')}.${milliseconds}`;
+    const timeStr = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
     return (
         <div className="flex justify-between items-center w-full max-w-[85vw] md:max-w-[500px] px-2 mb-0 text-white">

@@ -31,7 +31,7 @@ const GameOver = ({ won, time, livesUsed, onShare, onTryAgain }) => {
             </h2>
             {won && (
                 <div className="text-center mb-6">
-                    <p className="text-xl">Time: {time.toFixed(2)}s</p>
+                    <p className="text-xl">Time: {Math.floor(time / 60).toString().padStart(2, '0')}:{Math.floor(time % 60).toString().padStart(2, '0')}</p>
                     <p className="text-xl">Lives Used: {livesUsed}</p>
                 </div>
             )}

@@ -531,7 +531,7 @@ const Game = () => {
         const dayNumber = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) || 1;
 
         const isMobile = window.innerWidth < 768;
-        const modeTag = isMobile ? ' • 📱 Hard' : ' • ⌨️ Easy mode';
+        const modeTag = isMobile ? ' •📱Hard' : ' • ⌨️ Easy mode';
 
         const text = `🐸 Froggle #${dayNumber}${modeTag}\n❤️ ${livesUsed}\n⏱️ ${timeStr}\nhttps://froggle-daily.surge.sh`;
         navigator.clipboard.writeText(text).then(() => alert('Copied to clipboard!'));

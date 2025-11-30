@@ -7,10 +7,13 @@ body {
   background-color: #111827;
   /* gray-900 */
   color: white;
+  font-family: 'Courier New', Courier, monospace;
+  /* Pixel-ish font fallback */
 }
 
 @layer utilities {
   .font-pixel {
-    font-family: 'Outfit', sans-serif;
+    font-family: 'Courier New', Courier, monospace;
+    /* In a real app, I'd import a pixel font */
   }
 }

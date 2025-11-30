@@ -5,12 +5,7 @@ export default {
         "./src/**/*.{js,ts,jsx,tsx}",
     ],
     theme: {
-        extend: {
-            fontFamily: {
-                sans: ['Outfit', 'sans-serif'],
-                pixel: ['Outfit', 'sans-serif'], // Replacing pixel font with Outfit as requested
-            },
-        },
+        extend: {},
     },
     plugins: [],
 }

@@ -533,7 +533,8 @@ const Game = () => {
         const isMobile = window.innerWidth < 768;
         const modeTag = isMobile ? ' •📱Hard' : ' • ⌨️ Easy';
 
-        const text = `🐸 Froggle #${dayNumber}${modeTag}\n❤️ ${livesUsed}\n⏱️ ${timeStr}\nhttps://froggle-daily.surge.sh`;
+        const shareUrl = window.SHARE_URL || 'https://froggle-daily.surge.sh';
+        const text = `🐸 Froggle #${dayNumber}${modeTag}\n❤️ ${livesUsed}\n⏱️ ${timeStr}\n${shareUrl}`;
         navigator.clipboard.writeText(text).then(() => alert('Copied to clipboard!'));
     };
 

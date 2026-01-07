@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const GameOver = ({ won, time, livesUsed, onShare, onTryAgain }) => {
+const GameOver = ({ won, time, livesUsed, onShare }) => {
     const [countdown, setCountdown] = useState('');
 
     useEffect(() => {
@@ -42,14 +42,6 @@ const GameOver = ({ won, time, livesUsed, onShare, onTryAgain }) => {
                 >
                     Share Result
                 </button>
-                {won && (
-                    <button
-                        onClick={onTryAgain}
-                        className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg text-lg"
-                    >
-                        Try Again
-                    </button>
-                )}
             </div>
             <p className="text-sm text-gray-400 mt-6">Next Froggle in: {countdown}</p>
         </div>

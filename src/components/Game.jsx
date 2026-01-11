@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { GRID_SIZE, LANE_TYPES, OBJECT_SIZES, OBJECT_TYPES, SPEEDS, DIRECTIONS } from '../utils/constants';
+import { trackGameStarted, trackDeath, trackGameWon } from '../utils/analytics';
 import { getRNG } from '../utils/dailySeed';
 import { isColliding, moveFrog, findPlatformUnder, centerFrogOnPlatform } from '../utils/gameLogic';
 import Lane from './Lane';
@@ -353,6 +354,9 @@ const Game = () => {
 
         setLanes(newLanes);
         lanesRef.current = newLanes;
+
+        // Track game start for analytics
+        trackGameStarted();
     }, []);
 
     const handleMove = useCallback((direction) => {
@@ -470,6 +474,8 @@ const Game = () => {
         // Check Goal
         if (currentLane.type === LANE_TYPES.GOAL) {
             setGameState('won');
+            // Track game completion for analytics
+            trackGameWon(livesUsed, time);
             return;
         }
 
@@ -480,6 +486,9 @@ const Game = () => {
             if (!showWasted) {
                 setLivesUsed(l => l + 1);
                 setShowWasted(true);
+                // Track death for analytics heatmap
+                const deathCause = currentLane.type === LANE_TYPES.RIVER ? 'water' : 'vehicle';
+                trackDeath(frogPos.x, frogPos.y, currentLane.type, deathCause);
                 // Frog position reset is handled after Wasted screen or immediately?
                 // Requirement: "It does one flash, with wasted in red and B&W background."
                 // Usually in GTA you respawn after the wasted screen.
@@ -494,6 +503,8 @@ const Game = () => {
                     if (!showWasted) {
                         setLivesUsed(l => l + 1);
                         setShowWasted(true);
+                        // Track sinking turtle death
+                        trackDeath(frogPos.x, frogPos.y, currentLane.type, 'sinking_turtle');
                     }
                 }
             }
@@ -533,7 +544,7 @@ const Game = () => {
         const isMobile = window.innerWidth < 768;
         const modeTag = isMobile ? ' •📱Hard' : ' • ⌨️ Easy';
 
-        const shareUrl = window.SHARE_URL || 'https://froggle-daily.surge.sh';
+        const shareUrl = 'https://froggle.win';
         const text = `🐸 Froggle #${dayNumber}${modeTag}\n❤️ ${livesUsed}\n⏱️ ${timeStr}\n${shareUrl}`;
         navigator.clipboard.writeText(text).then(() => alert('Copied to clipboard!'));
     };
